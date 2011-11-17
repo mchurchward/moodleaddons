@@ -43,24 +43,29 @@ class block_twitter_search extends block_base {
         return true;
     }
 
+    function get_global_config() {
+        if (!isset($this->globalconfig)) {
+            if (($this->globalconfig = get_config('block_twitter_search')) == null) {
+                $this->globalconfig = new stdClass;
+                $this->globalconfig->defaultsearch = '#moodle';
+                $this->globalconfig->defaultnumtweets = 10;
+                $this->globalconfig->defaultpolltime = 30000;
+            }
+        }
+        return $this->globalconfig;
+    }
+
     function specialization() {
-        if(empty($this->config->search_string)) {
-            if (($defaultsearch = get_config('block_twitter_search', 'defaultsearch')) === false){
-                $defaultsearch = '#moodle';
-            }
-            $this->config->search_string = $defaultsearch;
+        $this->get_global_config();
+
+        if(!isset($this->config->search_string)) {
+            $this->config->search_string = $this->globalconfig->defaultsearch;
         }
-        if(empty($this->config->no_tweets)){
-            if (($defaultnumtweets = get_config('block_twitter_search', 'defaultnumtweets')) === false){
-                $defaultnumtweets = 10;
-            }
-            $this->config->no_tweets = $defaultnumtweets;
+        if(!isset($this->config->no_tweets)){
+            $this->config->no_tweets = $this->globalconfig->defaultnumtweets;
         }
-        if(empty($this->config->polltime)){
-            if (($defaultpolltime = get_config('block_twitter_search', 'defaultpolltime')) === false){
-                $defaultpolltime = 30000;
-            }
-            $this->config->polltime = $defaultpolltime;
+        if(!isset($this->config->polltime)){
+            $this->config->polltime = $this->globalconfig->defaultpolltime;
         }
     }
 
@@ -113,5 +118,9 @@ class block_twitter_search extends block_base {
                                  $this->instance->id."' />";
 
          return $this->content;
+    }
+
+    function before_delete() {
+        unset_all_config_for_plugin('block_twitter_search');
     }
 }

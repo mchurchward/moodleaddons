@@ -24,7 +24,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
  */
+define('AJAX_SCRIPT', true);
+
 require_once '../../config.php';
+
 require_login();
 $id = required_param('blockid', PARAM_NUMBER);
 $bi = $DB->get_record('block_instances', array('id' => $id));
